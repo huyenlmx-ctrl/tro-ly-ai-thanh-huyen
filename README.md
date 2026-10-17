@@ -1,63 +1,41 @@
 # Trợ Lý AI của Thanh Huyền
 
-Website trợ lý học tập tiếng Việt, giao diện responsive cho máy tính và điện thoại. Dùng Google Gemini API để giải thích bài học, ôn tập, luyện tiếng Anh và hướng dẫn giải bài từng bước.
+Website trợ lý học tập tiếng Việt với màn hình chào `Hello Thanh Huyền`, nút `Start♡`, giao diện hồng pastel, chat Gemini, gửi ảnh bài tập và chọn nhạc từ thiết bị.
 
-## Cách chạy thử trên máy tính
+## Chạy trên máy tính
 
-1. Tải và giải nén file ZIP.
-2. Mở thư mục `tro-ly-ai-thanh-huyen`.
-3. Nhấp đúp `index.html` để mở bằng Chrome hoặc Edge.
-4. Chọn **Cài đặt AI** → nhập Gemini API key → **Lưu cài đặt**.
-5. Nhập câu hỏi và nhấn **Gửi**.
+1. Giải nén file ZIP.
+2. Mở thư mục dự án và mở `index.html` bằng Chrome hoặc Edge.
+3. Nhấn **Start♡** để vào không gian học tập.
+4. Chọn **Cài đặt AI**, dán Gemini API key và lưu.
+5. Nhập câu hỏi hoặc nhấn **Gửi ảnh** để chọn ảnh bài tập rồi gửi cho AI.
+6. Trong mục **Góc âm nhạc**, chọn một file âm thanh trên thiết bị để phát khi học.
 
-Nếu trình duyệt chặn yêu cầu API khi mở bằng `file://`, hãy chạy website bằng máy chủ tĩnh. Có thể dùng VS Code và tiện ích Live Server, hoặc đăng lên GitHub Pages theo hướng dẫn dưới đây.
+## Đưa lên GitHub Pages
 
-## Đưa website lên GitHub Pages
+1. Giải nén ZIP.
+2. Mở repository GitHub của bạn.
+3. Chọn **Add file → Upload files**.
+4. Kéo các file bên trong thư mục dự án vào trang upload (không tải nguyên file ZIP lên): `index.html`, `style.css`, `app.js`, `README.md`, `.nojekyll`.
+5. Nhấn **Commit changes**.
+6. Vào **Settings → Pages**, chọn `Deploy from a branch`, branch `main`, folder `/(root)`, rồi nhấn **Save**.
+7. Chờ triển khai xong và mở đường link GitHub Pages.
 
-### 1. Tạo repository
+## Gemini API
 
-1. Đăng nhập GitHub tại https://github.com.
-2. Nhấn dấu **+** ở góc trên bên phải → **New repository**.
-3. Đặt tên repository là `tro-ly-ai-thanh-huyen`.
-4. Chọn **Public** (GitHub Pages miễn phí cho repository public) hoặc chọn gói phù hợp nếu muốn private.
-5. Nhấn **Create repository**.
+Tạo API key trong Google AI Studio: https://aistudio.google.com/app/apikey
 
-### 2. Tải mã nguồn lên GitHub
+Trên website, vào **Cài đặt AI**, dán key và lưu. Key được lưu trong localStorage của trình duyệt hiện tại, không được nhúng vào các file của dự án. Khi mở trên thiết bị/trình duyệt khác, cần cài key lại.
 
-1. Giải nén ZIP trên máy tính.
-2. Mở repository vừa tạo trên GitHub.
-3. Nhấn **Add file** → **Upload files**.
-4. Mở thư mục đã giải nén và kéo **các tệp bên trong** (`index.html`, `style.css`, `app.js`, `README.md`, `.nojekyll`) vào vùng tải lên. Đừng chỉ tải tệp ZIP lên.
-5. Chờ tải xong, nhập nội dung commit nếu được yêu cầu, rồi nhấn **Commit changes**.
+**Lưu ý bảo mật:** đây là dự án frontend cho học tập cá nhân. Với website công khai, người dùng có thể tự nhập key của họ; không chia sẻ API key cá nhân. Nếu muốn tất cả khách truy cập dùng AI mà không cần nhập key, hãy triển khai backend/serverless function để giữ key ở phía máy chủ. Không commit key lên GitHub.
 
-Lưu ý: `index.html` phải nằm ngay ở thư mục gốc repository, không nằm trong một thư mục con.
+## Gửi ảnh
 
-### 3. Bật GitHub Pages
+Nhấn **Gửi ảnh**, chọn ảnh JPG/PNG/WEBP (tối đa 10 MB), có thể nhập câu hỏi bổ sung rồi nhấn **Gửi**. AI phân tích ảnh qua Gemini, vì vậy cần API key và mô hình Gemini được cấp quyền hỗ trợ nội dung hình ảnh.
 
-1. Trong repository, mở **Settings**.
-2. Ở thanh bên trái chọn **Pages**.
-3. Trong phần **Build and deployment**, chọn **Deploy from a branch**.
-4. Chọn branch `main` và folder `/(root)`.
-5. Nhấn **Save**.
-6. Chờ vài phút. Trang Pages sẽ hiện địa chỉ dạng `https://TEN-TAI-KHOAN.github.io/tro-ly-ai-thanh-huyen/`. Mở địa chỉ đó để sử dụng.
+## Nhạc
 
-Tên tài khoản trong URL sẽ là tên GitHub của bạn, không phải tên website. Nếu Pages chưa hiện link ngay, tải lại trang Settings → Pages sau một lúc.
-
-## Kết nối Gemini API
-
-1. Mở Google AI Studio: https://aistudio.google.com/app/apikey
-2. Đăng nhập tài khoản Google và tạo API key theo hướng dẫn hiện tại của Google.
-3. Trên website, mở **Cài đặt AI**, dán key, chọn mô hình và nhấn **Lưu cài đặt**.
-4. Gửi một câu hỏi thử nghiệm.
-
-Quyền truy cập, hạn mức và chi phí (nếu có) phụ thuộc chính sách Google tại thời điểm sử dụng. Không chia sẻ API key.
-
-## Quan trọng về bảo mật
-
-- API key không được nhúng sẵn trong mã nguồn và không được tải lên GitHub cùng dự án.
-- Website lưu key trong `localStorage` của trình duyệt đang dùng. Người khác sử dụng một trình duyệt/thiết bị khác sẽ cần nhập key riêng.
-- Đây là bản phù hợp cho dự án cá nhân/học tập. Nếu muốn mở website công khai để nhiều người sử dụng mà không phải tự nhập key, hãy thêm backend/serverless function để giữ API key ở phía máy chủ. Không đưa key bí mật vào `app.js`, `index.html` hay repository.
-- Không gửi thông tin riêng tư, mật khẩu hoặc dữ liệu nhạy cảm vào trợ lý.
+Nhấn **Chọn nhạc từ thiết bị** trong mục **Góc âm nhạc**. Tệp nhạc được phát trực tiếp trong trình duyệt; file nhạc không được tải lên GitHub hoặc gửi đến AI. Khi tải lại trang, bạn có thể cần chọn lại file.
 
 ## Cấu trúc dự án
 
@@ -69,11 +47,3 @@ tro-ly-ai-thanh-huyen/
 ├── README.md
 └── .nojekyll
 ```
-
-## Khắc phục nhanh
-
-- **Website hiện 404:** kiểm tra Settings → Pages đã chọn `main` và `/(root)` chưa; đảm bảo `index.html` nằm ở thư mục gốc.
-- **AI báo key không hợp lệ:** tạo/kiểm tra lại key, quyền Gemini API và chọn mô hình khác trong Cài đặt AI.
-- **AI báo giới hạn:** đợi rồi thử lại, kiểm tra hạn mức trong Google AI Studio.
-- **Mở file trực tiếp nhưng không gọi được API:** dùng GitHub Pages hoặc máy chủ tĩnh như Live Server.
-- **Sửa website sau này:** tải tệp đã sửa lên lại repository và commit changes; GitHub Pages tự triển khai lại sau ít phút.

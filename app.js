@@ -13,6 +13,7 @@
   let history = [];
   let busy = false;
   let toastTimer;
+  let selectedImage = null;
 
   const getKey = () => {
     try { return localStorage.getItem(STORAGE_KEY) || ""; } catch (_) { return ""; }
@@ -99,6 +100,13 @@
     const bubble = document.createElement("div");
     bubble.className = "bubble";
     bubble.innerHTML = markdownToHTML(text);
+    if (role === "user" && options.imageUrl) {
+      const image = document.createElement("img");
+      image.className = "message-image";
+      image.src = options.imageUrl;
+      image.alt = "Ảnh bài tập người dùng gửi";
+      bubble.prepend(image);
+    }
     body.append(name, bubble);
     if (role === "assistant" && !options.typing) {
       const actions = document.createElement("div");
@@ -136,16 +144,19 @@
     if (status >= 500) return "Dịch vụ AI đang gặp sự cố. Hãy thử lại sau ít phút.";
     return message || "Không thể kết nối AI. Hãy kiểm tra mạng và thử lại.";
   }
-  async function askGemini(userText) {
+  async function askGemini(userText, imageData) {
     const apiKey = getKey();
     if (!apiKey) {
       openSettings();
       throw new Error("Bạn cần thêm Gemini API key trong Cài đặt AI trước khi gửi câu hỏi.");
     }
     const model = getModel();
-    const contents = history.concat([{ role: "user", parts: [{ text: userText }] }]);
+    const parts = [];
+    if (userText) parts.push({ text: userText });
+    if (imageData) parts.push({ inlineData: { mimeType: imageData.mimeType, data: imageData.base64 } });
+    const contents = history.concat([{ role: "user", parts }]);
     const systemInstruction = {
-      parts: [{ text: "Bạn là Trợ Lý AI của Thanh Huyền, một trợ lý học tập thân thiện bằng tiếng Việt. Giải thích rõ ràng, đúng trình độ học sinh THPT khi phù hợp; trình bày có tiêu đề và gạch đầu dòng khi hữu ích; hướng dẫn giải từng bước, không bịa dữ kiện. Nếu đề bài thiếu thông tin, hãy hỏi lại. Với bài tập, ưu tiên giải thích cách làm để người học hiểu, không chỉ đưa đáp án. Khi luyện tiếng Anh, dùng từ vựng phù hợp trình độ và sửa lỗi nhẹ nhàng." }]
+      parts: [{ text: "Bạn là Trợ Lý AI của Thanh Huyền, một trợ lý học tập thân thiện bằng tiếng Việt. Giải thích rõ ràng, đúng trình độ học sinh THPT khi phù hợp; trình bày có tiêu đề và gạch đầu dòng khi hữu ích; hướng dẫn giải từng bước, không bịa dữ kiện. Nếu đề bài thiếu thông tin, hãy hỏi lại. Với bài tập trong ảnh, hãy đọc nội dung ảnh cẩn thận, nêu lại dữ kiện nhìn thấy được và giải thích cách làm từng bước. Nếu ảnh mờ hoặc không đọc được, hãy nói rõ và đề nghị gửi ảnh rõ hơn. Khi luyện tiếng Anh, dùng từ vựng phù hợp trình độ và sửa lỗi nhẹ nhàng." }]
     };
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
       method: "POST",
@@ -171,18 +182,24 @@
   }
   async function submitPrompt(rawText) {
     const text = String(rawText || "").trim();
-    if (!text || busy) return;
+    const imageData = selectedImage;
+    if ((!text && !imageData) || busy) return;
     if (text.length > 12000) { toast("Câu hỏi quá dài. Hãy rút gọn còn dưới 12.000 ký tự."); return; }
     inputEl.value = "";
     inputEl.style.height = "auto";
-    addMessage("user", text);
+    const shownText = text || "Hãy đọc ảnh bài tập này và hướng dẫn mình giải từng bước nhé.";
+    addMessage("user", shownText, { imageUrl: imageData ? imageData.dataUrl : null });
+    clearSelectedImage();
     setBusy(true);
     const typing = showTyping();
     try {
-      const answer = await askGemini(text);
+      const answer = await askGemini(text || "Hãy đọc ảnh bài tập này và hướng dẫn mình giải từng bước nhé.", imageData);
       typing.remove();
       addMessage("assistant", answer);
-      history.push({ role: "user", parts: [{ text }] }, { role: "model", parts: [{ text: answer }] });
+      const parts = [];
+      if (text || !imageData) parts.push({ text: text || shownText });
+      if (imageData) parts.push({ inlineData: { mimeType: imageData.mimeType, data: imageData.base64 } });
+      history.push({ role: "user", parts }, { role: "model", parts: [{ text: answer }] });
       if (history.length > 24) history = history.slice(-24);
     } catch (error) {
       typing.remove();
@@ -191,6 +208,14 @@
       setBusy(false);
       inputEl.focus();
     }
+  }
+  function clearSelectedImage() {
+    selectedImage = null;
+    const imageInput = $("imageInput");
+    if (imageInput) imageInput.value = "";
+    $("imagePreview").hidden = true;
+    $("previewImage").removeAttribute("src");
+    $("imageFilename").textContent = "";
   }
   function resetChat() {
     if (busy) return;
@@ -252,5 +277,59 @@
       else submitPrompt(prompt);
     });
   });
+
+  // Intro screen: the landing page appears whenever the site is opened.
+  $("startBtn").addEventListener("click", () => {
+    $("introScreen").classList.add("intro-leaving");
+    setTimeout(() => {
+      $("introScreen").hidden = true;
+      $("appShell").hidden = false;
+      window.scrollTo(0, 0);
+    }, 260);
+  });
+  $("backIntroBtn").addEventListener("click", () => {
+    $("appShell").hidden = true;
+    $("introScreen").hidden = false;
+    $("introScreen").classList.remove("intro-leaving");
+    window.scrollTo(0, 0);
+  });
+
+  // Local music picker. The chosen audio file stays on the user's device.
+  let currentMusicUrl = "";
+  $("musicInput").addEventListener("change", () => {
+    const file = $("musicInput").files && $("musicInput").files[0];
+    if (!file) return;
+    if (!file.type.startsWith("audio/")) { toast("Hãy chọn một tệp âm thanh."); return; }
+    if (currentMusicUrl) URL.revokeObjectURL(currentMusicUrl);
+    currentMusicUrl = URL.createObjectURL(file);
+    $("musicPlayer").src = currentMusicUrl;
+    $("musicFilename").textContent = file.name;
+    $("musicPlayer").load();
+    $("musicPlayer").play().catch(() => toast("Đã thêm nhạc. Nhấn nút phát để nghe nhé."));
+  });
+  window.addEventListener("beforeunload", () => { if (currentMusicUrl) URL.revokeObjectURL(currentMusicUrl); });
+
+  // Image attachment for Gemini vision.
+  $("imageInput").addEventListener("change", () => {
+    const file = $("imageInput").files && $("imageInput").files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast("Hãy chọn tệp ảnh như JPG, PNG hoặc WEBP."); clearSelectedImage(); return; }
+    if (file.size > 10 * 1024 * 1024) { toast("Ảnh hơi lớn. Hãy chọn ảnh nhỏ hơn 10 MB."); clearSelectedImage(); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result || "");
+      const comma = dataUrl.indexOf(",");
+      if (comma < 0) { toast("Không đọc được ảnh này. Hãy thử ảnh khác."); return; }
+      selectedImage = { dataUrl, mimeType: file.type || "image/jpeg", base64: dataUrl.slice(comma + 1), name: file.name };
+      $("previewImage").src = dataUrl;
+      $("imageFilename").textContent = file.name;
+      $("imagePreview").hidden = false;
+      toast("Đã thêm ảnh. Bạn có thể nhập thêm câu hỏi rồi nhấn Gửi.");
+    };
+    reader.onerror = () => toast("Không đọc được ảnh. Hãy thử lại.");
+    reader.readAsDataURL(file);
+  });
+  $("removeImageBtn").addEventListener("click", clearSelectedImage);
+
   if (getKey()) $("setupHint").hidden = true;
 })();

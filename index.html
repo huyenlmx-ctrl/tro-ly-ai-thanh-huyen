@@ -3,13 +3,27 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#6558d3">
-  <meta name="description" content="Trợ Lý AI của Thanh Huyền — trợ lý học tập giúp giải thích bài, ôn tập và luyện tiếng Anh.">
+  <meta name="theme-color" content="#f7b8d0">
+  <meta name="description" content="Trợ Lý AI của Thanh Huyền — không gian học tập màu hồng pastel, có chat AI, nhạc và gửi ảnh bài tập.">
   <title>Trợ Lý AI của Thanh Huyền</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-shell">
+  <section class="intro-screen" id="introScreen" aria-label="Màn hình chào">
+    <div class="intro-grain"></div><div class="intro-content">
+      <div class="intro-sparkle" aria-hidden="true">✦</div>
+      <p class="intro-script">Hello Thanh Huyền</p>
+      <p class="intro-subtitle">A LITTLE SPACE JUST FOR YOU</p>
+      <p class="intro-quote">“Learn gently, grow beautifully.”</p>
+      <button class="start-btn" id="startBtn" type="button">Start♡ <span aria-hidden="true">♡</span></button>
+      <p class="intro-footnote">your cozy study corner ✧</p>
+    </div>
+  </section>
+
+  <div class="app-shell" id="appShell" hidden>
     <aside class="sidebar" id="sidebar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">✦</div>
@@ -21,45 +35,65 @@
       <button class="side-prompt" data-prompt="Tạo cho mình một đề cương ôn tập có ý chính và ví dụ.">📝 Tạo đề cương ôn tập</button>
       <button class="side-prompt" data-prompt="Hãy luyện tiếng Anh với mình bằng từ vựng đơn giản, từng câu một.">🌍 Luyện tiếng Anh</button>
       <button class="side-prompt" data-prompt="Hướng dẫn mình giải bài này từng bước và giải thích vì sao làm như vậy.">🧠 Giải bài từng bước</button>
+
+      <section class="music-card" aria-label="Trình phát nhạc">
+        <div class="music-heading"><span class="music-icon">♫</span><div><strong>Góc âm nhạc</strong><small>Nghe nhạc khi học</small></div></div>
+        <label class="music-upload" for="musicInput">＋ Chọn nhạc từ thiết bị</label>
+        <input id="musicInput" type="file" accept="audio/*" hidden>
+        <p class="music-filename" id="musicFilename">Chưa chọn bài nhạc nào</p>
+        <audio id="musicPlayer" controls preload="none"></audio>
+        <p class="music-note">Chọn file MP3, WAV hoặc định dạng âm thanh được trình duyệt hỗ trợ.</p>
+      </section>
+
       <div class="sidebar-bottom">
-        <div class="privacy-note"><span class="status-dot"></span><span>Chìa khóa API được lưu trên trình duyệt này.</span></div>
+        <div class="privacy-note"><span class="status-dot"></span><span>API key chỉ được lưu trên trình duyệt này.</span></div>
         <button class="settings-btn" id="settingsBtn" type="button">⚙ Cài đặt AI</button>
+        <button class="back-intro-btn" id="backIntroBtn" type="button">♡ Màn hình chào</button>
       </div>
     </aside>
 
     <main class="main-panel">
       <header class="topbar">
         <button class="mobile-menu" id="mobileMenuBtn" aria-label="Mở menu" type="button">☰</button>
-        <div class="topbar-title"><span class="online-dot"></span> Trợ lý học tập <span class="model-pill">Gemini</span></div>
-        <button class="clear-btn" id="clearBtn" type="button" title="Xóa nội dung trò chuyện">Làm mới</button>
+        <div class="topbar-title"><span class="online-dot"></span> Trợ lý học tập <span class="model-pill">✦ Gemini</span></div>
+        <button class="clear-btn" id="clearBtn" type="button">Làm mới ↻</button>
       </header>
 
       <section class="conversation" id="conversation" aria-live="polite">
         <div class="welcome" id="welcome">
           <div class="welcome-orb">✦</div>
-          <p class="eyebrow">KHÔNG GIAN HỌC TẬP CỦA BẠN</p>
-          <h1>Chào Thanh Huyền!<br><span>Hôm nay mình học gì nhỉ?</span></h1>
-          <p class="welcome-copy">Mình có thể giúp bạn hiểu bài, luyện tập và lên kế hoạch học tập — từng bước một, dễ hiểu và không áp lực.</p>
+          <p class="eyebrow">KHÔNG GIAN HỌC TẬP CỦA HUYỀN</p>
+          <h1>Chào Thanh Huyền!<br><span>Hôm nay mình cùng tiến bộ nhé.</span></h1>
+          <p class="welcome-copy">Một góc nhỏ xinh để học tập, nghe nhạc và gỡ rối những bài khó — từng bước một, theo cách nhẹ nhàng nhất.</p>
           <div class="suggestion-grid">
-            <button class="suggestion" data-prompt="Giải thích một kiến thức khó theo cách dễ hiểu, có ví dụ minh họa."><span>💡</span><strong>Giải thích dễ hiểu</strong><small>Biến kiến thức khó thành đơn giản</small></button>
-            <button class="suggestion" data-prompt="Tạo 5 câu hỏi trắc nghiệm để mình ôn bài, đừng đưa đáp án ngay."><span>🎯</span><strong>Kiểm tra kiến thức</strong><small>Ôn tập bằng câu hỏi ngắn</small></button>
-            <button class="suggestion" data-prompt="Giúp mình lập kế hoạch học tập trong 7 ngày, mỗi ngày vừa sức."><span>🗓️</span><strong>Lập kế hoạch học</strong><small>Chia nhỏ mục tiêu mỗi ngày</small></button>
-            <button class="suggestion" data-prompt="Luyện tiếng Anh với mình ở trình độ cơ bản. Hỏi từng câu và sửa lỗi nhẹ nhàng."><span>🌱</span><strong>Luyện tiếng Anh</strong><small>Học từ vựng và giao tiếp</small></button>
+            <button class="suggestion" data-prompt="Giải thích một kiến thức khó theo cách dễ hiểu, có ví dụ minh họa."><span class="suggestion-icon pink">♡</span><strong>Giải thích dễ hiểu</strong><small>Biến kiến thức khó thành đơn giản</small><b>›</b></button>
+            <button class="suggestion" data-prompt="Tạo 5 câu hỏi trắc nghiệm để mình ôn bài, đừng đưa đáp án ngay."><span class="suggestion-icon coral">✧</span><strong>Kiểm tra kiến thức</strong><small>Ôn tập bằng câu hỏi ngắn</small><b>›</b></button>
+            <button class="suggestion" data-prompt="Giúp mình lập kế hoạch học tập trong 7 ngày, mỗi ngày vừa sức."><span class="suggestion-icon mint">♡</span><strong>Lập kế hoạch học</strong><small>Chia nhỏ mục tiêu mỗi ngày</small><b>›</b></button>
+            <button class="suggestion" data-prompt="Luyện tiếng Anh với mình ở trình độ cơ bản. Hỏi từng câu và sửa lỗi nhẹ nhàng."><span class="suggestion-icon blue">Aa</span><strong>Luyện tiếng Anh</strong><small>Học từ vựng và giao tiếp</small><b>›</b></button>
           </div>
-          <p class="setup-hint" id="setupHint">Để bắt đầu, hãy thêm Gemini API key trong <button id="inlineSettingsBtn" type="button">Cài đặt AI</button>.</p>
+          <p class="setup-hint" id="setupHint">Để bắt đầu trò chuyện, hãy thêm Gemini API key trong <button id="inlineSettingsBtn" type="button">Cài đặt AI</button>.</p>
         </div>
         <div class="messages" id="messages"></div>
       </section>
 
       <section class="composer-wrap">
+        <div class="image-preview" id="imagePreview" hidden>
+          <img id="previewImage" alt="Ảnh bài tập đã chọn">
+          <div><strong>Ảnh bài tập đã chọn</strong><small id="imageFilename"></small></div>
+          <button id="removeImageBtn" type="button" aria-label="Bỏ ảnh">×</button>
+        </div>
         <form class="composer" id="chatForm">
-          <textarea id="userInput" rows="1" placeholder="Nhập câu hỏi học tập của bạn..." aria-label="Nhập câu hỏi" maxlength="12000"></textarea>
+          <textarea id="userInput" rows="1" placeholder="Huyền muốn hỏi điều gì nè? Có thể gửi kèm ảnh bài tập ♡" aria-label="Nhập câu hỏi" maxlength="12000"></textarea>
           <div class="composer-bottom">
-            <span class="composer-tip">AI có thể mắc lỗi — hãy kiểm tra lại thông tin quan trọng.</span>
-            <button class="send-btn" id="sendBtn" type="submit" aria-label="Gửi câu hỏi"><span>Gửi</span> ↑</button>
+            <div class="composer-tools">
+              <label class="attach-btn" for="imageInput" title="Chọn ảnh bài tập">▧ <span>Gửi ảnh</span></label>
+              <input id="imageInput" type="file" accept="image/*" hidden>
+              <span class="composer-tip">Enter để gửi · Shift + Enter xuống dòng</span>
+            </div>
+            <button class="send-btn" id="sendBtn" type="submit"><span>Gửi</span> ↑</button>
           </div>
         </form>
-        <p class="footer-note">Được thiết kế để đồng hành cùng việc học của Thanh Huyền ✦</p>
+        <p class="footer-note">Học theo cách của bạn, tiến bộ theo nhịp của bạn ♡</p>
       </section>
     </main>
   </div>
@@ -67,9 +101,9 @@
   <div class="modal-backdrop" id="settingsModal" hidden>
     <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <button class="modal-close" id="closeSettingsBtn" type="button" aria-label="Đóng">×</button>
-      <div class="modal-icon">⚙</div>
+      <div class="modal-icon">✦</div>
       <h2 id="settingsTitle">Cài đặt trợ lý AI</h2>
-      <p class="modal-description">Kết nối Gemini để nhận câu trả lời AI. Bạn cần tạo API key miễn phí hoặc theo điều kiện hiện hành của Google AI Studio.</p>
+      <p class="modal-description">Kết nối Gemini để nhận câu trả lời và phân tích ảnh bài tập. Bạn cần tạo API key trong Google AI Studio.</p>
       <label for="apiKeyInput">Gemini API key</label>
       <div class="key-field"><input id="apiKeyInput" type="password" autocomplete="off" placeholder="Dán API key vào đây"><button id="toggleKeyBtn" type="button">Hiện</button></div>
       <label for="modelSelect">Mô hình</label>
@@ -77,7 +111,7 @@
         <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
         <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
       </select>
-      <div class="security-note"><strong>🔒 Lưu ý bảo mật</strong><br>Key được lưu trong bộ nhớ cục bộ của trình duyệt này, không nằm trong mã nguồn GitHub. Đừng dùng key cá nhân trên máy công cộng hoặc chia sẻ key cho người khác. Nếu làm website công khai cho nhiều người dùng, nên tạo backend để bảo vệ key.</div>
+      <div class="security-note"><strong>🔒 Lưu ý bảo mật</strong><br>Key được lưu trong bộ nhớ cục bộ của trình duyệt này, không nằm trong mã nguồn GitHub. Đừng chia sẻ key. Website công khai cho nhiều người dùng nên có backend để bảo vệ key.</div>
       <div class="modal-actions"><button class="secondary-btn" id="removeKeyBtn" type="button">Xóa key</button><button class="primary-btn" id="saveSettingsBtn" type="button">Lưu cài đặt</button></div>
       <p class="settings-status" id="settingsStatus" role="status"></p>
     </section>
